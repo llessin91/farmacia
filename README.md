@@ -10,7 +10,7 @@ Abra `index.html` no navegador ou publique o projeto como site estático. Para s
 
 A URL e a chave `anon/public` informadas já estão aplicadas em `config.js`. Essa chave foi feita para uso no navegador; a proteção dos dados depende de RLS e nunca substitui as políticas de acesso.
 
-1. No SQL Editor do projeto informado, execute `supabase/schema.sql`.
+1. No SQL Editor do projeto informado, execute novamente o conteúdo atualizado de `supabase/schema.sql` para incluir o novo campo `needs_prescription` (seguro para bancos já configurados).
 2. Publique o site e abra **Configurações → Conectar Supabase** para criar sua conta ou entrar. Pode ser preciso confirmar seu e-mail.
 3. Autorize o domínio publicado na configuração de autenticação do Supabase.
 4. Para desenvolvimento local, use a configuração já preenchida, mas não acrescente chaves `service_role` nem outros segredos ao site.
@@ -45,8 +45,9 @@ O teste manual usa a sessão autenticada; o job de lembretes exige o segredo do 
 
 ## Funcionalidades desta versão
 
-- Cadastro, edição e remoção de medicamentos; quantidade/unidade, consumo diário e data-base.
-- Desconto de estoque por tempo decorrido, pausa do desconto e limites personalizados para receita/estoque baixo.
+- Cadastro, edição e remoção de medicamentos; clicar no nome na visão geral ou na lista abre a edição.
+- Opção individual para indicar se o medicamento precisa de receita; somente itens marcados recebem alertas de renovação.
+- Quantidade/unidade, consumo diário e data-base; desconto de estoque por tempo decorrido, pausa e limites personalizados para receita/estoque baixo.
 - Registro de compras: data, quantidade, valor e observação; soma ao saldo e mostra histórico.
 - Visão geral, filtros, responsividade, exportação e remoção dos dados locais.
 - Login Supabase, dados privados com RLS e sincronização entre dispositivos após executar o schema.

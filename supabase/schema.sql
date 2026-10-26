@@ -14,6 +14,7 @@ create table if not exists public.medications (
   base_date date not null default current_date,
   started_at date not null default current_date,
   prescription_days integer not null default 14 check (prescription_days >= 0),
+  needs_prescription boolean not null default false,
   low_stock_days integer not null default 7 check (low_stock_days >= 0),
   paused boolean not null default false,
   paused_days_offset integer not null default 0 check (paused_days_offset >= 0),
@@ -21,6 +22,8 @@ create table if not exists public.medications (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.medications add column if not exists needs_prescription boolean not null default false;
 
 create table if not exists public.purchases (
   id uuid primary key default gen_random_uuid(),

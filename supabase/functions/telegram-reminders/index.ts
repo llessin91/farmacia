@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   if (!serviceKey || !supabaseUrl) return json({ error: "Configure os secrets do Supabase." }, 500);
   const db = createClient(supabaseUrl, serviceKey);
-  const { data: meds, error } = await db.from("medications").select("id,user_id,name,unit,base_remaining,daily_consumption,base_date,prescription_days,low_stock_days,paused,paused_days_offset");
+  const { data: meds, error } = await db.from("medications").select("id,user_id,name,unit,base_remaining,daily_consumption,base_date,prescription_days,needs_prescription,low_stock_days,paused,paused_days_offset");
   if (error) return json({ error: error.message }, 500);
   const today = new Date(); today.setUTCHours(0, 0, 0, 0);
   const alerts: string[] = [];
@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
     if (daily <= 0) continue;
     const days = remaining / daily;
     if (days <= Number(m.low_stock_days)) alerts.push(`⚠️ Estoque baixo: ${m.name} — cerca de ${Math.floor(days)} dia(s) restantes (${remaining} ${m.unit}).`);
-    else if (days <= Number(m.prescription_days)) alerts.push(`📄 Receita: ${m.name} — cerca de ${Math.floor(days)} dia(s) de estoque. Verifique se precisa pedir a receita.`);
+    else if (m.needs_prescription && days <= Number(m.prescription_days)) alerts.push(`📄 Receita: ${m.name} — cerca de ${Math.floor(days)} dia(s) de estoque. Verifique se precisa pedir a receita.`);
   }
   if (!alerts.length) return json({ sent: false, reason: "Nenhum alerta no momento." });
   const message = `Lembretes da Minha Farmácia\n\n${alerts.join("\n\n")}\n\nEstimativas organizacionais — confirme suas orientações com um profissional de saúde.`;
