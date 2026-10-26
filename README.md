@@ -8,21 +8,33 @@ Abra `index.html` no navegador ou publique o projeto como site estático. Para s
 
 ## Configurar o Supabase
 
-1. Crie um projeto Supabase e mantenha o acesso restrito à sua conta.
-2. No SQL Editor, execute `supabase/schema.sql`.
-3. Copie `config.js.example` para `config.js` e informe o Project URL e a chave **anon/public** do Supabase. `config.js` é ignorado pelo Git.
-4. Publique o projeto e use a tela **Configurações → Conectar Supabase** para criar/acessar a conta. A chave `service_role` nunca deve ser colocada no navegador.
-5. Configure confirmação de e-mail e políticas de senha no Supabase conforme preferir. A tabela usa Row Level Security e associa os dados ao usuário autenticado.
+A URL e a chave `anon/public` informadas já estão aplicadas em `config.js`. Essa chave foi feita para uso no navegador; a proteção dos dados depende de RLS e nunca substitui as políticas de acesso.
 
-> A conexão com o banco requer acesso à internet para carregar a biblioteca cliente do Supabase pelo CDN. Os segredos não são necessários para testar o modo local.
+1. No SQL Editor do projeto informado, execute `supabase/schema.sql`.
+2. Publique o site e abra **Configurações → Conectar Supabase** para criar sua conta ou entrar. Pode ser preciso confirmar seu e-mail.
+3. Autorize o domínio publicado na configuração de autenticação do Supabase.
+4. Para desenvolvimento local, use a configuração já preenchida, mas não acrescente chaves `service_role` nem outros segredos ao site.
 
-## Telegram (requer configuração do servidor)
+> A primeira sessão pode sincronizar os medicamentos e compras já salvos localmente. Revise os dados depois do login.
 
-O token do bot e o chat ID **não** podem ficar no navegador, neste repositório público ou na configuração da Vercel. A função de exemplo fica em `supabase/functions/telegram-reminders/index.ts`.
+## Telegram (configuração única no Supabase)
 
-Para ativar, crie um bot no Telegram, obtenha o chat ID e publique a Edge Function. Cadastre `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` e `CRON_SECRET` como secrets da função. Configure o agendamento do Supabase Cron para chamar a função periodicamente usando o cabeçalho `x-cron-secret` com o valor de `CRON_SECRET`. A chave `SUPABASE_SERVICE_ROLE_KEY` é usada só no runtime seguro do Supabase; jamais a exponha no navegador.
+O token do bot e o chat ID permanecem somente nos secrets do servidor — nunca no navegador, GitHub ou Vercel. A função está em `supabase/functions/telegram-reminders/index.ts`.
 
-A função envia a cada execução os medicamentos que cruzaram seus limites. **Ainda falta implementar deduplicação/registro dos alertas enviados**, portanto agende com cuidado para evitar mensagens repetidas. O endpoint rejeita chamadas sem o segredo do Cron. Não coloque credenciais reais no repositório.
+1. No Telegram, crie um bot com `@BotFather`, abra a conversa com ele e envie `/start`. Obtenha seu chat ID (por exemplo, com `@userinfobot`).
+2. Faça deploy da função `telegram-reminders` no projeto Supabase.
+3. Cadastre `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID` nos secrets da Edge Function. Para executar também o job agendado, configure `CRON_SECRET`.
+4. No app, entre na sua conta e use **Configurações → Configurar Telegram → Testar envio**. O teste é autenticado e só envia uma mensagem fixa de verificação.
+5. Para lembretes automáticos com o site fechado, configure Supabase Cron para chamar a função via POST com o cabeçalho `x-cron-secret` igual ao `CRON_SECRET`. Defina uma frequência apropriada.
+
+O teste manual usa a sessão autenticada; o job de lembretes exige o segredo do Cron. A chave `SUPABASE_SERVICE_ROLE_KEY` só pode ser usada no ambiente seguro da função. Alertas automáticos são enviados a cada execução enquanto permanecerem dentro do limite; evite agendamento muito frequente para não receber repetições.
+
+## Publicar no GitHub e Vercel
+
+1. Crie um repositório GitHub **privado**, pois o app pode guardar informação relacionada à saúde.
+2. Envie os arquivos do projeto. Nunca adicione o token Telegram ou a chave `service_role` ao repositório.
+3. Importe o repositório privado na Vercel. O site estático não exige etapa de build.
+4. Configure o domínio da publicação na autenticação do Supabase.
 
 ## Publicar no GitHub e Vercel
 
@@ -37,7 +49,8 @@ A função envia a cada execução os medicamentos que cruzaram seus limites. **
 - Desconto de estoque por tempo decorrido, pausa do desconto e limites personalizados para receita/estoque baixo.
 - Registro de compras: data, quantidade, valor e observação; soma ao saldo e mostra histórico.
 - Visão geral, filtros, responsividade, exportação e remoção dos dados locais.
-- Login Supabase opcional e armazenamento local para uso/demonstração.
+- Login Supabase, dados privados com RLS e sincronização entre dispositivos após executar o schema.
+- Teste autenticado de entrega Telegram e lembretes automáticos via Supabase Cron após configurar os secrets.
 
 ## Observações
 

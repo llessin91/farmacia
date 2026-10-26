@@ -16,6 +16,7 @@ create table if not exists public.medications (
   prescription_days integer not null default 14 check (prescription_days >= 0),
   low_stock_days integer not null default 7 check (low_stock_days >= 0),
   paused boolean not null default false,
+  paused_days_offset integer not null default 0 check (paused_days_offset >= 0),
   color text not null default '',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -38,6 +39,15 @@ create index if not exists purchases_medication_idx on public.purchases(medicati
 
 alter table public.medications enable row level security;
 alter table public.purchases enable row level security;
+
+drop policy if exists "medications_select_own" on public.medications;
+drop policy if exists "medications_insert_own" on public.medications;
+drop policy if exists "medications_update_own" on public.medications;
+drop policy if exists "medications_delete_own" on public.medications;
+drop policy if exists "purchases_select_own" on public.purchases;
+drop policy if exists "purchases_insert_own" on public.purchases;
+drop policy if exists "purchases_update_own" on public.purchases;
+drop policy if exists "purchases_delete_own" on public.purchases;
 
 create policy "medications_select_own" on public.medications for select to authenticated using (auth.uid() = user_id);
 create policy "medications_insert_own" on public.medications for insert to authenticated with check (auth.uid() = user_id);
