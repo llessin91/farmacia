@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7f8f5" />
+  <meta name="description" content="Organize seus medicamentos, acompanhe o estoque estimado e receba lembretes." />
+  <title>Minha Farmácia — Controle de medicamentos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#inicio" aria-label="Minha Farmácia, início"><span class="brand-mark">✳</span><span>minha<span class="brand-light">farmácia</span></span></a>
+      <div class="nav-label">SEU ESPAÇO</div>
+      <nav class="nav">
+        <button class="nav-item active" data-page="inicio"><span class="nav-icon">⌂</span>Visão geral</button>
+        <button class="nav-item" data-page="medicamentos"><span class="nav-icon">▤</span>Medicamentos <span class="nav-count" id="nav-count">0</span></button>
+        <button class="nav-item" data-page="historico"><span class="nav-icon">◷</span>Histórico</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-note"><span class="note-icon">✦</span><div><strong>Um cuidado de cada vez</strong><p>Organização para você manter sua rotina em dia.</p></div></div>
+        <button class="nav-item" data-page="configuracoes"><span class="nav-icon">⚙</span>Configurações</button>
+        <div class="profile" id="profile-area"><div class="avatar">L</div><div class="profile-copy"><strong id="profile-name">Modo local</strong><span id="profile-status">Dados salvos neste aparelho</span></div><button class="profile-menu" id="auth-action" aria-label="Entrar ou sair">⋯</button></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><button class="mobile-menu" id="mobile-menu" aria-label="Abrir menu">☰</button><div class="crumb"><span>Meu espaço</span><span class="crumb-sep">/</span><strong id="page-crumb">Visão geral</strong></div><div class="top-actions"><span class="today" id="today"></span><button class="icon-button" id="alert-button" aria-label="Ver alertas">♧<i id="alert-dot" class="alert-dot hidden"></i></button><button class="primary-button compact" id="add-top">＋ <span>Novo medicamento</span></button></div></header>
+      <section class="content">
+        <div class="welcome-row"><div><div class="eyebrow"><span class="live-dot"></span>SEU CUIDADO, ORGANIZADO</div><h1 id="greeting">Olá <span>☀</span></h1><p class="subtitle">Acompanhe seus medicamentos e fique um passo à frente.</p></div><div class="welcome-date" id="long-date"></div></div>
+        <div id="page-content"></div>
+        <footer>Feito para ajudar na organização. <strong>Não substitui a orientação de um profissional de saúde.</strong></footer>
+      </section>
+    </main>
+  </div>
+  <div id="modal-root"></div><div id="toast-root" class="toast-root" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
