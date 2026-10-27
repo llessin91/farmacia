@@ -62,3 +62,29 @@ create policy "purchases_update_own" on public.purchases for update to authentic
 create policy "purchases_delete_own" on public.purchases for delete to authenticated using (auth.uid() = user_id);
 
 -- O front-end deve usar somente a chave anon/public. Nunca exponha service_role.
+
+
+-- Pendências independentes de receita e compra, repetidas até confirmação no app.
+create table if not exists public.medication_reminders (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  medication_id uuid not null references public.medications(id) on delete cascade,
+  kind text not null check (kind in ('prescription', 'purchase')),
+  status text not null default 'pending' check (status in ('pending', 'completed')),
+  is_eligible boolean not null default true,
+  last_notified_at timestamptz,
+  completed_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (medication_id, kind)
+);
+create index if not exists medication_reminders_user_status_idx on public.medication_reminders(user_id, status);
+alter table public.medication_reminders enable row level security;
+drop policy if exists "medication_reminders_select_own" on public.medication_reminders;
+drop policy if exists "medication_reminders_insert_own" on public.medication_reminders;
+drop policy if exists "medication_reminders_update_own" on public.medication_reminders;
+drop policy if exists "medication_reminders_delete_own" on public.medication_reminders;
+create policy "medication_reminders_select_own" on public.medication_reminders for select to authenticated using (auth.uid() = user_id);
+create policy "medication_reminders_insert_own" on public.medication_reminders for insert to authenticated with check (auth.uid() = user_id and exists (select 1 from public.medications m where m.id = medication_id and m.user_id = auth.uid()));
+create policy "medication_reminders_update_own" on public.medication_reminders for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id and exists (select 1 from public.medications m where m.id = medication_id and m.user_id = auth.uid()));
+create policy "medication_reminders_delete_own" on public.medication_reminders for delete to authenticated using (auth.uid() = user_id);
