@@ -13,9 +13,29 @@
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="auth-required">
-  <main id="auth-screen" class="auth-screen" aria-live="polite"></main>
-  <div class="shell">
+<body>
+  <main id="auth-screen" class="auth-screen" aria-labelledby="auth-title">
+    <section class="auth-card">
+      <a class="brand auth-brand" href="#" aria-label="Minha Farmácia"><span class="brand-mark">✳</span><span>minha<span class="brand-light">farmácia</span></span></a>
+      <div class="auth-eyebrow"><span class="live-dot"></span>SEU CUIDADO, ORGANIZADO</div>
+      <h1 id="auth-title">Bem-vindo à sua farmácia</h1>
+      <p class="auth-subtitle">Entre para acessar suas listas e manter suas informações sincronizadas.</p>
+      <div class="auth-tabs" role="tablist"><button type="button" class="auth-tab active" data-auth-mode="login">Entrar</button><button type="button" class="auth-tab" data-auth-mode="signup">Criar conta</button></div>
+      <form id="auth-form" class="auth-form">
+        <div id="auth-name-wrap" class="auth-field" hidden><label for="auth-name">Nome completo</label><input id="auth-name" name="fullName" autocomplete="name" placeholder="Como podemos chamar você?"></div>
+        <div class="auth-field"><label for="auth-email">E-mail</label><input id="auth-email" name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com"></div>
+        <div id="auth-password-wrap" class="auth-field"><label for="auth-password">Senha</label><input id="auth-password" name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="Pelo menos 8 caracteres"></div>
+        <label id="remember-wrap" class="remember-row"><input id="remember-device" type="checkbox" checked><span>Manter conectado neste dispositivo</span></label>
+        <button id="auth-submit" class="primary-button auth-submit" type="submit">Entrar</button>
+        <button id="forgot-password" class="auth-link" type="button">Esqueci minha senha</button>
+        <div class="auth-divider"><span>ou</span></div>
+        <button id="google-signin" class="google-button" type="button"><span class="google-g">G</span>Continuar com Google</button>
+        <p id="auth-message" class="auth-message" role="status" aria-live="polite"></p>
+      </form>
+      <p class="auth-privacy">Suas informações ficam vinculadas à sua conta. Não compartilhe sua senha.</p>
+    </section>
+  </main>
+  <div class="shell" id="app-shell" hidden>
     <button class="drawer-backdrop" id="drawer-backdrop" type="button" aria-label="Fechar menu" tabindex="-1"></button>
     <aside class="sidebar" id="sidebar" aria-label="Menu principal">
       <a class="brand" href="#inicio" aria-label="Minha Farmácia, início"><span class="brand-mark">✳</span><span>minha<span class="brand-light">farmácia</span></span></a>
@@ -29,11 +49,11 @@
       <div class="sidebar-bottom">
         <div class="sidebar-note"><span class="note-icon">✦</span><div><strong>Um cuidado de cada vez</strong><p>Organização para você manter sua rotina em dia.</p></div></div>
         <button class="nav-item" data-page="configuracoes"><span class="nav-icon">⚙</span>Configurações</button>
-        <div class="profile" id="profile-area"><div class="avatar">L</div><div class="profile-copy"><strong id="profile-name">Modo local</strong><span id="profile-status">Dados salvos neste aparelho</span></div><button class="profile-menu" id="auth-action" aria-label="Sair da conta">⋯</button></div>
+        <div class="profile" id="profile-area"><div class="avatar">L</div><div class="profile-copy"><strong id="profile-name">Modo local</strong><span id="profile-status">Dados salvos neste aparelho</span></div><button class="profile-menu" id="auth-action" aria-label="Entrar ou sair">⋯</button></div>
       </div>
     </aside>
     <main class="main">
-      <header class="topbar"><button class="mobile-menu" id="mobile-menu" aria-label="Abrir menu">☰</button><div class="crumb"><span>Meu espaço</span><span class="crumb-sep">/</span><strong id="page-crumb">Visão geral</strong></div><div class="top-actions"><select id="list-select" class="list-select" aria-label="Selecionar lista" title="Lista de medicamentos"></select><span class="today" id="today"></span><button class="icon-button" id="alert-button" aria-label="Ver alertas">♧<i id="alert-dot" class="alert-dot hidden"></i></button><button class="primary-button compact" id="add-top">＋ <span>Novo medicamento</span></button></div></header>
+      <header class="topbar"><button class="mobile-menu" id="mobile-menu" aria-label="Abrir menu">☰</button><div class="crumb"><span>Meu espaço</span><span class="crumb-sep">/</span><strong id="page-crumb">Visão geral</strong></div><div class="top-actions"><label class="list-switcher"><span>Lista</span><select id="active-list" aria-label="Selecionar lista de medicamentos"></select></label><button id="manage-lists" class="secondary-button list-manage" type="button">Gerenciar listas</button><span class="today" id="today"></span><button class="icon-button" id="alert-button" aria-label="Ver alertas">♧<i id="alert-dot" class="alert-dot hidden"></i></button><button class="primary-button compact" id="add-top">＋ <span>Novo medicamento</span></button></div></header>
       <section class="content">
         <div class="welcome-row"><div><div class="eyebrow"><span class="live-dot"></span>SEU CUIDADO, ORGANIZADO</div><h1 id="greeting">Olá <span>☀</span></h1><p class="subtitle">Acompanhe seus medicamentos e fique um passo à frente.</p></div><div class="welcome-date" id="long-date"></div></div>
         <div id="page-content"></div>

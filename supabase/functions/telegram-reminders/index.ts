@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     if (!ownerId || !serviceKey || !supabaseUrl) return json({ error: "Configure TELEGRAM_OWNER_USER_ID e as credenciais de serviço do Supabase." }, 500);
     const db = createClient(supabaseUrl, serviceKey);
-    const { data: meds, error: medError } = await db.from("medications").select("id,user_id,list_id,name,unit,base_remaining,daily_consumption,base_date,prescription_days,needs_prescription,low_stock_days,paused,paused_days_offset,list:medication_lists(name)").eq("user_id", ownerId);
+    const { data: meds, error: medError } = await db.from("medications").select("id,user_id,name,unit,base_remaining,daily_consumption,base_date,prescription_days,needs_prescription,low_stock_days,paused,paused_days_offset").eq("user_id", ownerId);
     if (medError) return json({ error: medError.message }, 500);
     const { data: existing, error: reminderError } = await db.from("medication_reminders").select("id,medication_id,kind,status,is_eligible").eq("user_id", ownerId);
     if (reminderError) return json({ error: reminderError.message }, 500);
@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
         const key = `${m.id}:${kind}`;
         const reminder: any = byKey.get(key);
         if (!reminder && eligible) {
-          const { error } = await db.from("medication_reminders").insert({ user_id: ownerId, list_id: m.list_id, medication_id: m.id, kind, status: "pending", is_eligible: true });
+          const { error } = await db.from("medication_reminders").insert({ user_id: ownerId, medication_id: m.id, kind, status: "pending", is_eligible: true });
           if (error && error.code !== "23505") return json({ error: error.message }, 500);
           if (!error) created++;
         } else if (reminder) {
@@ -58,20 +58,18 @@ Deno.serve(async (req) => {
         }
       }
     }
-    const { data: pending, error: pendingError } = await db.from("medication_reminders").select("id,list_id,kind,last_notified_at,medication:medications(name,unit,base_remaining,daily_consumption,base_date,paused,paused_days_offset,list:medication_lists(name))").eq("user_id", ownerId).eq("status", "pending");
+    const { data: pending, error: pendingError } = await db.from("medication_reminders").select("id,kind,last_notified_at,medication:medications(name,unit,base_remaining,daily_consumption,base_date,paused,paused_days_offset)").eq("user_id", ownerId).eq("status", "pending");
     if (pendingError) return json({ error: pendingError.message }, 500);
     const todayUtc = new Date().toISOString().slice(0, 10);
     const due = (pending || []).filter((r: any) => !r.last_notified_at || String(r.last_notified_at).slice(0, 10) < todayUtc);
     if (!due.length) return json({ sent: false, created, reason: "Nenhum lembrete pendente para enviar hoje." });
     const lines = due.map((r: any) => {
       const m = Array.isArray(r.medication) ? r.medication[0] : r.medication;
-      const list = Array.isArray(m?.list) ? m.list[0] : m?.list;
-      const person = list?.name ? `[${list.name}] ` : "";
-      if (r.kind === "prescription") return `📄 ${person}Pedir/renovar a receita de ${m?.name || "medicamento"}.`;
+      if (r.kind === "prescription") return `📄 Pedir/renovar a receita de ${m?.name || "medicamento"}.`;
       const st = medicationStatus(m || {});
-      return `🛒 ${person}Comprar ${m?.name || "medicamento"} — estoque estimado: ${Math.floor(st.remaining)} ${m?.unit || "unidades"}, cerca de ${Math.floor(st.days)} dia(s).`;
+      return `🛒 Comprar ${m?.name || "medicamento"} — estoque estimado: ${Math.floor(st.remaining)} ${m?.unit || "unidades"}, cerca de ${Math.floor(st.days)} dia(s).`;
     });
-    const message = `Lembretes pendentes da Minha Farmácia (listas da sua conta)\n\n${lines.join("\n\n")}\n\nConfirme cada ação no app. Lembretes organizacionais — siga sempre a orientação do profissional de saúde.`;
+    const message = `Lembretes pendentes da Minha Farmácia\n\n${lines.join("\n\n")}\n\nConfirme cada ação no app. Lembretes organizacionais — siga sempre a orientação do profissional de saúde.`;
     try {
       await sendTelegram(telegramToken, chatId, message);
       const notifiedAt = new Date().toISOString();

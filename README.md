@@ -1,70 +1,62 @@
-# Minha Farmácia — versão com contas e listas
+# Minha Farmácia — controle pessoal de medicamentos
 
-Aplicativo web para organização pessoal de medicamentos, com login por e-mail ou Google, listas separadas por pessoa, cards navegáveis, histórico e lembretes Telegram identificados pela lista. Não é ferramenta de orientação clínica: mantenha o tratamento conforme a orientação profissional.
+Aplicativo web responsivo para organizar medicamentos, estimar o saldo pelo consumo diário, registrar reposições e definir limites para receita e estoque baixo. O cálculo é **uma previsão organizacional**, não confirma a tomada de doses nem substitui orientação profissional.
 
-## Antes de começar
+## Testar
 
-- Faça uma cópia/backup do repositório e do banco antes de atualizar.
-- Use o projeto Supabase `nzfjrqhhxbpjjuusvzja` já configurado em `config.js`; esta é somente a chave pública anon, nunca a `service_role`.
-- O banco guarda informação pessoal de saúde. Mantenha o repositório privado e não envie tokens ou chaves privadas para o GitHub.
+Abra `index.html` no navegador ou publique o projeto como site estático. O app exige uma conta para entrar; sem sessão, qualquer acesso direto mostra a tela de login. Para sincronizar em vários dispositivos, configure o projeto Supabase conforme abaixo.
 
-## Atualização do banco (primeiro)
+## Configurar o Supabase
 
-1. Entre no painel Supabase do projeto.
-2. Abra **SQL Editor → New query**.
-3. No projeto, abra `supabase/schema.sql`, copie o conteúdo completo e cole na consulta.
-4. Clique **Run** e confirme que a execução terminou sem erro. A migração cria as listas e o histórico e associa os medicamentos/compras existentes à lista padrão; não apaga seus cadastros.
-5. Se aparecer erro, pare antes de atualizar/publicar o site e guarde a mensagem de erro.
+A URL e a chave `anon/public` informadas já estão aplicadas em `config.js`. Essa chave foi feita para uso no navegador; a proteção dos dados depende de RLS e nunca substitui as políticas de acesso.
 
-## Configuração de login por e-mail e Google
+1. No SQL Editor do projeto informado, execute o conteúdo atualizado de `supabase/schema.sql`. Ele cria/atualiza as tabelas de medicamentos, compras, listas por pessoa e lembretes pendentes com RLS. Cadastros existentes recebem a lista padrão “Minha lista”.
+2. Publique o site e use a tela inicial para entrar, criar uma conta com nome completo, recuperar senha ou continuar com Google. A opção “Manter conectado neste dispositivo” controla a duração da sessão.
+3. Autorize o domínio publicado na configuração de autenticação do Supabase.
+4. Para desenvolvimento local, use a configuração já preenchida, mas não acrescente chaves `service_role` nem outros segredos ao site.
 
-### E-mail
+> A primeira sessão pode sincronizar os medicamentos e compras já salvos localmente. Revise os dados depois do login.
 
-1. Supabase → **Authentication → URL Configuration**: cadastre o endereço publicado do site em **Site URL** e em **Redirect URLs**. Para desenvolvimento, adicione também o endereço local usado para testar.
-2. Supabase → **Authentication → Providers → Email**: mantenha e-mail habilitado. A confirmação e o envio de redefinição dependem dos templates/configurações de e-mail do projeto.
-3. Ao abrir qualquer endereço da aplicação sem uma sessão válida, a pessoa será levada à tela de acesso. Nela pode entrar, criar uma conta ou escolher **Continuar com Google**. A opção **Manter conectado neste dispositivo** grava a sessão neste aparelho; deixe-a desmarcada em aparelhos compartilhados. Para recuperar acesso, use **Esqueci minha senha** e abra o link enviado ao e-mail.
+## Telegram (configuração única no Supabase)
 
-### Google OAuth
+O token do bot e o chat ID permanecem somente nos secrets do servidor — nunca no navegador, GitHub ou Vercel. A função está em `supabase/functions/telegram-reminders/index.ts`.
 
-1. Crie/seleciona um projeto no Google Cloud Console e configure a tela de consentimento OAuth.
-2. Crie credenciais do tipo **OAuth client ID → Web application**.
-3. Copie o **Callback URL / Redirect URL** exibido em Supabase → **Authentication → Providers → Google** e cadastre-o como **Authorized redirect URI** no Google Cloud. Não use o endereço do app como callback do provedor; use exatamente o callback do Supabase mostrado ali.
-4. Cole o **Client ID** e o **Client Secret** do Google na configuração do provedor Google no Supabase e habilite o provedor. Guarde o Client Secret só no painel Supabase.
-5. Em Supabase **URL Configuration → Redirect URLs**, autorize também o domínio publicado do app.
-6. Teste **Continuar com Google** em janela privada e confirme que volta ao app com a conta certa. Se deseja vincular Google a uma conta por e-mail existente, entre primeiro nessa conta e use **Configurações → Vincular Google**; não crie contas paralelas sem conferir qual guarda seus dados. Para sair da conta, use o botão de sessão no rodapé do menu lateral. O usuário conectado não pode ser exibido em **Configurações** como opção de entrar ou criar conta.
+1. No Telegram, crie um bot com `@BotFather`, abra a conversa com ele e envie `/start`. Obtenha seu chat ID (por exemplo, com `@userinfobot`).
+2. Faça deploy da função `telegram-reminders` no projeto Supabase.
+3. Cadastre `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_OWNER_USER_ID` (UUID do usuário Supabase que receberá os avisos) e `CRON_SECRET` nos secrets da Edge Function. O identificador do dono evita que dados de outras contas sejam enviados ao chat pessoal.
+4. No app, entre na sua conta e use **Configurações → Configurar Telegram → Testar envio**. O teste é autenticado e só envia uma mensagem fixa de verificação.
+5. Publique novamente a Edge Function `telegram-reminders` e configure Supabase Cron para chamá-la via POST com `x-cron-secret` igual ao `CRON_SECRET`, uma vez por dia no horário desejado. O Cron usa UTC; 9h de Brasília corresponde a `0 12 * * *`.
 
-> O código não contém credenciais Google. O OAuth só funcionará depois de cadastrar Client ID/Secret no Supabase e URLs de retorno corretas.
+O teste manual usa a sessão autenticada; o job de lembretes exige o segredo do Cron e o UUID configurado em `TELEGRAM_OWNER_USER_ID`. Cada pendência tem estado independente e é reenviada no máximo uma vez por dia enquanto estiver aberta. A chave `SUPABASE_SERVICE_ROLE_KEY` só pode ser usada no ambiente seguro da função.
 
-## Atualizar o site pelo Codespaces/GitHub
+## Publicar no GitHub e Vercel
 
-1. Abra o Codespace **`farmacia`** (não `medica`) e confirme a pasta principal do repositório.
-2. Baixe e extraia esta versão atualizada no computador.
-3. No Codespaces, substitua os arquivos `app.js`, `index.html`, `styles.css`, `README.md`, `supabase/schema.sql` e `supabase/functions/telegram-reminders/index.ts` pelos correspondentes desta atualização. Preserve o `config.js` existente no Codespace se ele já aponta para o projeto correto. Não envie arquivos temporários de `supabase/.temp`.
-4. Em **Source Control**, confira que aparecem somente os arquivos esperados acima. Escreva `Adiciona login e listas por pessoa`, clique **Commit** e depois **Sync Changes**.
-5. Aguarde a publicação automática na Vercel. Atualize o site com recarga forçada; no celular, feche e reabra a página.
+1. Crie um repositório GitHub **privado**, pois o app pode guardar informação relacionada à saúde.
+2. Envie os arquivos do projeto. Nunca adicione o token Telegram ou a chave `service_role` ao repositório.
+3. Importe o repositório privado na Vercel. O site estático não exige etapa de build.
+4. Configure o domínio da publicação na autenticação do Supabase.
 
-## Telegram (a conexão existente é preservada)
+## Publicar no GitHub e Vercel
 
-O bot e o chat configurados continuam os mesmos. Os lembretes passam a mostrar o nome da lista, por exemplo `[Mãe] Comprar ...`. O Cron continua usando o dono definido em `TELEGRAM_OWNER_USER_ID`; assim, esta versão notifica as listas pertencentes a essa conta, no chat pessoal atualmente configurado. Ainda não há vinculação Telegram individual por conta nem compartilhamento entre usuários.
+1. Crie um repositório GitHub **privado**, pois este aplicativo pode guardar informação relacionada à saúde.
+2. Envie o conteúdo desta pasta. Não adicione credenciais, `config.js` configurado, token Telegram ou chave `service_role` ao repositório.
+3. Importe o repositório privado na Vercel. A configuração incluída publica a página estática; não é necessário build.
+4. Depois da primeira publicação, configure o domínio autorizado de autenticação no painel Supabase.
 
-1. Se a Edge Function atual ainda é a anterior, no Codespace `farmacia`, abra o terminal e publique **apenas depois de concluir a migração do banco**: `npx supabase functions deploy telegram-reminders --use-api`. Se já publicou os arquivos novos, não é necessário publicar de novo.
-2. Preserve `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_OWNER_USER_ID` e `CRON_SECRET` nos secrets do Supabase. Não os cole no site, SQL, GitHub ou conversa.
-3. O UUID em `TELEGRAM_OWNER_USER_ID` precisa ser o ID da conta que administra as listas; login Google e e-mail devem ser vinculados à mesma conta Supabase se quiserem usar o mesmo conjunto de listas.
-4. Mantenha o Cron diário existente. Para 9h em Brasília, expressão UTC: `0 12 * * *`. Teste em **Configurações → Configurar Telegram → Testar envio** e valide uma execução agendada.
+## Funcionalidades desta versão
 
-## Conferência após publicar
+- Cadastro, edição e remoção de medicamentos; clicar no nome na visão geral ou na lista abre a edição.
+- Opção individual para indicar se o medicamento precisa de receita; somente itens marcados recebem alertas de renovação.
+- Quantidade/unidade, consumo diário e data-base; desconto de estoque por tempo decorrido, pausa e limites personalizados para receita/estoque baixo.
+- Registro de compras: data, quantidade, valor e observação; soma ao saldo e mostra histórico.
+- Visão geral, filtros, responsividade, exportação e remoção dos dados locais.
+- Login obrigatório por e-mail/senha ou Google, cadastro com nome, recuperação de senha e sessão opcionalmente persistente.
+- Listas nomeadas por pessoa com troca, criação, renomeação e arquivamento na barra superior; cada lista mantém dados separados.
+- Teste autenticado de entrega Telegram; pendências separadas para pedir receita e comprar; compra confirmada atualiza o estoque e o histórico.
+- Reenvio diário no Telegram até confirmação no app, com controle de envio por pendência e proteção de destinatário via `TELEGRAM_OWNER_USER_ID`.
 
-- Entrar com e-mail; testar recuperação da senha.
-- Entrar com Google e confirmar que abre a conta esperada.
-- Criar listas de teste, trocar entre elas e confirmar que medicamentos, compras e lembretes não se misturam.
-- Conferir que os quatro cards do resumo abrem as áreas relacionadas.
-- Fazer uma compra de teste com medicamento de demonstração e confirmar que o saldo e o histórico mudam; não altere tratamentos/dados reais só para testar.
-- Confirmar que a mensagem Telegram identifica a lista.
+## Observações
 
-## Limites e privacidade
-
-- Listas pertencem à conta que entrou; não dão acesso à própria pessoa listada nem a outras contas. Compartilhamento entre logins fica para outra versão.
-- A integração Telegram envia avisos das listas do proprietário configurado para um único chat já cadastrado; criar mais contas não cria destinos Telegram automaticamente.
-- Não há exclusão de conta nesta versão. Excluir lista apaga medicamentos, compras e histórico dessa lista e pede confirmação.
-- Dados existentes na conta são migrados para a lista padrão `Minha lista`. Revise após a atualização.
-- A previsão de estoque depende dos valores inseridos pelo usuário e não confirma tomada de doses.
+- A sincronização Supabase é habilitada após preencher a configuração e entrar com uma conta. Execute o SQL atualizado antes de abrir a nova área de lembretes.
+- Alertas dentro do app são calculados ao abrir/atualizar a página; alertas Telegram exigem agendamento no servidor para chegar mesmo quando o site estiver fechado.
+- O usuário confirma quantidades e consumo com as orientações recebidas do profissional de saúde.
