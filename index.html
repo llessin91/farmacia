@@ -13,7 +13,8 @@
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+<body class="auth-required">
+  <main id="auth-screen" class="auth-screen" aria-live="polite"></main>
   <div class="shell">
     <button class="drawer-backdrop" id="drawer-backdrop" type="button" aria-label="Fechar menu" tabindex="-1"></button>
     <aside class="sidebar" id="sidebar" aria-label="Menu principal">
@@ -28,7 +29,7 @@
       <div class="sidebar-bottom">
         <div class="sidebar-note"><span class="note-icon">✦</span><div><strong>Um cuidado de cada vez</strong><p>Organização para você manter sua rotina em dia.</p></div></div>
         <button class="nav-item" data-page="configuracoes"><span class="nav-icon">⚙</span>Configurações</button>
-        <div class="profile" id="profile-area"><div class="avatar">L</div><div class="profile-copy"><strong id="profile-name">Modo local</strong><span id="profile-status">Dados salvos neste aparelho</span></div><button class="profile-menu" id="auth-action" aria-label="Entrar ou sair">⋯</button></div>
+        <div class="profile" id="profile-area"><div class="avatar">L</div><div class="profile-copy"><strong id="profile-name">Modo local</strong><span id="profile-status">Dados salvos neste aparelho</span></div><button class="profile-menu" id="auth-action" aria-label="Sair da conta">⋯</button></div>
       </div>
     </aside>
     <main class="main">

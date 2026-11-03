@@ -22,7 +22,7 @@ Aplicativo web para organização pessoal de medicamentos, com login por e-mail 
 
 1. Supabase → **Authentication → URL Configuration**: cadastre o endereço publicado do site em **Site URL** e em **Redirect URLs**. Para desenvolvimento, adicione também o endereço local usado para testar.
 2. Supabase → **Authentication → Providers → Email**: mantenha e-mail habilitado. A confirmação e o envio de redefinição dependem dos templates/configurações de e-mail do projeto.
-3. No app, escolha **Entrar / criar conta**. Para recuperar acesso, use **Esqueci minha senha** e abra o link enviado ao e-mail.
+3. Ao abrir qualquer endereço da aplicação sem uma sessão válida, a pessoa será levada à tela de acesso. Nela pode entrar, criar uma conta ou escolher **Continuar com Google**. A opção **Manter conectado neste dispositivo** grava a sessão neste aparelho; deixe-a desmarcada em aparelhos compartilhados. Para recuperar acesso, use **Esqueci minha senha** e abra o link enviado ao e-mail.
 
 ### Google OAuth
 
@@ -31,7 +31,7 @@ Aplicativo web para organização pessoal de medicamentos, com login por e-mail 
 3. Copie o **Callback URL / Redirect URL** exibido em Supabase → **Authentication → Providers → Google** e cadastre-o como **Authorized redirect URI** no Google Cloud. Não use o endereço do app como callback do provedor; use exatamente o callback do Supabase mostrado ali.
 4. Cole o **Client ID** e o **Client Secret** do Google na configuração do provedor Google no Supabase e habilite o provedor. Guarde o Client Secret só no painel Supabase.
 5. Em Supabase **URL Configuration → Redirect URLs**, autorize também o domínio publicado do app.
-6. Teste **Continuar com Google** em janela privada e confirme que volta ao app com a conta certa. Se deseja vincular Google a uma conta por e-mail existente, entre primeiro nessa conta e use **Configurações → Vincular Google**; não crie contas paralelas sem conferir qual guarda seus dados.
+6. Teste **Continuar com Google** em janela privada e confirme que volta ao app com a conta certa. Se deseja vincular Google a uma conta por e-mail existente, entre primeiro nessa conta e use **Configurações → Vincular Google**; não crie contas paralelas sem conferir qual guarda seus dados. Para sair da conta, use o botão de sessão no rodapé do menu lateral. O usuário conectado não pode ser exibido em **Configurações** como opção de entrar ou criar conta.
 
 > O código não contém credenciais Google. O OAuth só funcionará depois de cadastrar Client ID/Secret no Supabase e URLs de retorno corretas.
 
