@@ -6,3 +6,64 @@
 
 /* Cards do resumo: toda a área é clicável e acessível por teclado. */
 button.summary-card{display:block;width:100%;appearance:none;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}button.summary-card:hover{transform:translateY(-2px);border-color:#cbded1;box-shadow:0 10px 24px rgba(33,48,44,.09)}button.summary-card:focus-visible{outline:3px solid #7fa991;outline-offset:3px}
+
+
+/* Identidade visual Minha Farmácia: verde-petróleo, verde suave, branco e azul-claro. */
+:root{--ink:#183b37;--muted:#71827d;--line:#e4ece8;--paper:#fff;--canvas:#f4f8f6;--green:#176457;--green-dark:#124e45;--mint:#e7f3ef;--orange:#b97835;--red:#b95750;--shadow:0 8px 26px rgba(24,59,55,.055);--sky:#e8f3f8;--sky-ink:#5d8294}
+body{background:var(--canvas);color:var(--ink);font-family:"DM Sans",sans-serif}
+.sidebar{background:#fff;border-right-color:#e3ece7;padding-top:24px}
+.brand{gap:11px;color:var(--ink);font-size:18px;letter-spacing:-.45px;padding-bottom:42px}
+.brand-light{color:#286c60;font-weight:600}
+.brand-mark{background:transparent;border-radius:0;width:38px;height:38px;overflow:hidden;flex:none}
+.brand-mark img{display:block;width:100%;height:100%;object-fit:contain}
+.nav-item{border-radius:10px;color:#61736d;transition:background .18s ease,color .18s ease,transform .18s ease}
+.nav-item:hover{background:#f1f7f4;color:var(--green);transform:translateX(1px)}
+.nav-item.active{background:#e8f3ef;color:var(--green)}
+.nav-count{background:#dceee7;color:#286c60}
+.sidebar-note{background:#f2f7f4;border:1px solid #edf3ef;border-radius:13px}
+.topbar{background:rgba(255,255,255,.94);border-bottom-color:#e5ede8}
+.primary-button{background:var(--green);border-radius:10px;box-shadow:0 3px 8px rgba(23,100,87,.14);transition:background .16s ease,transform .16s ease,box-shadow .16s ease}
+.primary-button:hover{background:var(--green-dark);transform:translateY(-1px);box-shadow:0 6px 14px rgba(23,100,87,.18)}
+.primary-button:focus-visible,.secondary-button:focus-visible,.icon-button:focus-visible,.filter-btn:focus-visible,.text-action:focus-visible,.small-action:focus-visible{outline:3px solid #9bc9b7;outline-offset:2px}
+.secondary-button{border-color:#d6e5dd;border-radius:9px;color:var(--green);transition:background .16s ease,border-color .16s ease}
+.secondary-button:hover{background:#f3f8f5;border-color:#b9d6c8}
+.icon-button{border-radius:10px;background:#fff}
+.content{max-width:1220px}
+h1{color:#183b37}
+.eyebrow{color:#577b70}
+.live-dot{background:#61a28b;box-shadow:0 0 0 4px rgba(97,162,139,.12)}
+.summary-card,.panel{border-color:#e5ede8;border-radius:15px;box-shadow:var(--shadow)}
+button.summary-card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+button.summary-card:hover{border-color:#c4dcd0;box-shadow:0 12px 28px rgba(24,59,55,.085)}
+.metric-icon{background:#e8f3ee;color:#286c60;border-radius:9px}
+.metric-icon.blue{background:var(--sky);color:var(--sky-ink)}
+.panel{padding:20px}
+.panel-title{font-size:14px;color:#21443e}
+.panel-subtitle{color:#879791;font-size:11px}
+.med-row{border-top-color:#edf2ef}
+.med-avatar{background:#eaf4ef;color:#286c60;border-radius:11px}
+.med-avatar.amber{background:#f7f1e8;color:#a8753b}
+.med-avatar.rose{background:#f8eeee;color:#b15c58}
+.stock-bar{background:#edf2ef}
+.stock-fill{background:#72a98e}
+.status-pill{background:#eaf4ef;color:#39735d;border-radius:999px}
+.status-pill.warn{background:#fbf2e5;color:#9d6a2f}
+.status-pill.critical{background:#f9eceb;color:#a94e49}
+.alert-item{border-radius:11px}
+.filter-btn{border-radius:9px;transition:background .15s ease,border-color .15s ease,color .15s ease}
+.filter-btn:hover{border-color:#c7dcd0;color:var(--green)}
+.filter-btn.selected{background:#eaf4ef;border-color:#d5e8dd;color:var(--green)}
+.small-action{border-radius:8px;transition:color .15s ease,border-color .15s ease,background .15s ease}
+.small-action:hover{background:#f5faf7}
+.auth-screen{background:radial-gradient(ellipse at 50% 0%,#e7f3ed 0,transparent 48%),var(--canvas)}
+.auth-card{border-color:#e4ede8;border-radius:20px;box-shadow:0 20px 60px rgba(24,59,55,.075)}
+.auth-brand{padding-bottom:27px}
+.auth-card h1{color:#183b37}
+.auth-tab.active{color:var(--green);border-bottom-color:var(--green)}
+.auth-field input,.field input,.field select{border-color:#dfe9e3;border-radius:9px}
+.auth-field input:focus,.field input:focus,.field select:focus{border-color:#78aa95;box-shadow:0 0 0 3px #e8f3ee}
+.modal{border-radius:17px}
+.modal-backdrop{background:rgba(16,39,34,.50)}
+.reminder-card{border-radius:12px}
+.toast{border-radius:11px;background:#194d43}
+@media(max-width:700px){.brand{padding-bottom:42px}.panel{padding:16px}.brand-mark{width:36px;height:36px}}
