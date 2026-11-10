@@ -1,0 +1,4 @@
+# A Edge Function valida cada rota internamente: webhook por secret token,
+# cron por CRON_SECRET e teste manual pela sessão autenticada do Supabase.
+[functions.telegram-reminders]
+verify_jwt = false
