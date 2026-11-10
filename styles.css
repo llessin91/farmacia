@@ -67,3 +67,20 @@ button.summary-card:hover{border-color:#c4dcd0;box-shadow:0 12px 28px rgba(24,59
 .reminder-card{border-radius:12px}
 .toast{border-radius:11px;background:#194d43}
 @media(max-width:700px){.brand{padding-bottom:42px}.panel{padding:16px}.brand-mark{width:36px;height:36px}}
+
+/* Ordenação da tabela de medicamentos e ações discretas por ícone. */
+.sort-header{display:inline-flex;align-items:center;gap:5px;padding:0;border:0;background:transparent;color:inherit;font:inherit;text-transform:inherit;letter-spacing:inherit;cursor:pointer;white-space:nowrap}
+.sort-header:hover{color:var(--green)}
+.sort-header:focus-visible{outline:2px solid #78aa95;outline-offset:3px;border-radius:3px}
+.sort-indicator{font-size:11px;line-height:1;color:#a2b0aa}
+.sort-header:hover .sort-indicator,.sort-header:focus-visible .sort-indicator{color:var(--green)}
+.medication-table{min-width:980px}
+.medication-table th:nth-child(3),.medication-table td:nth-child(3),.medication-table th:nth-child(4),.medication-table td:nth-child(4){display:table-cell}
+.actions-heading{text-align:center!important}
+.row-actions{justify-content:center;gap:3px}
+.row-actions .icon-action{width:29px;height:29px;padding:0;display:grid;place-items:center;border-color:transparent;background:transparent;color:#758780;opacity:.82}
+.row-actions .icon-action:hover,.row-actions .icon-action:focus-visible{background:#edf5f1;border-color:#dbe9e1;color:var(--green);opacity:1}
+.row-actions .icon-action.is-active{color:var(--green);background:#edf5f1}
+.row-actions .icon-action.danger-icon:hover,.row-actions .icon-action.danger-icon:focus-visible{color:#ae514c;background:#fbefee;border-color:#f2dfdd}
+.icon-action svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:700px){.table-scroll{overscroll-behavior-x:contain}.medication-table{min-width:980px}.row-actions .icon-action{width:28px;height:28px}}
