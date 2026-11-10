@@ -15,7 +15,7 @@ function unit(m){return m.unit||'unidades'}
 function fmtQty(n){return Number.isInteger(n)?String(n):n.toLocaleString('pt-BR',{maximumFractionDigits:1})}
 function daysText(n){if(!Number.isFinite(n))return 'Sem previsão';if(n<=0)return 'Estoque zerado';if(n<1)return 'Menos de 1 dia';return `${Math.floor(n)} ${Math.floor(n)===1?'dia':'dias'}`}
 function needsPrescription(m){return m.needsPrescription===true}
-function hasPrescriptionAlert(m){return needsPrescription(m)&&getDays(m)<=Number(m.prescriptionDays||0)}
+function hasPrescriptionAlert(m){const reminder=state.reminders.find(r=>r.medId===m.id&&r.kind==='prescription');return needsPrescription(m)&&getDays(m)<=Number(m.prescriptionDays||0)&&(!reminder||reminder.status==='pending')}
 function needsAttention(m){return getRemaining(m)<=0||getDays(m)<=Number(m.lowDays||0)||hasPrescriptionAlert(m)}
 function statusFor(m){let remaining=getRemaining(m),d=getDays(m);if(remaining<=0)return {label:'Acabou',cls:'critical'};if(d<=Number(m.lowDays||0))return {label:d<=1?'Acabando':'Estoque baixo',cls:'critical'};if(hasPrescriptionAlert(m))return {label:'Pedir receita',cls:'warn'};return {label:'Em dia',cls:''}}
 function dateLong(d=new Date()){return new Intl.DateTimeFormat('pt-BR',{weekday:'long',day:'numeric',month:'long'}).format(d)}
